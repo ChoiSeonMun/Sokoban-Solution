@@ -33,13 +33,13 @@ namespace Sokoban
             const int INITIAL_PLAYER_Y = 0;
             const string PLAYER_STRING = "P";
 
-            const int INITIAL_BOX_X = 5;
-            const int INITIAL_BOX_Y = 5;
             const string BOX_STRING = "B";
-
-            const int INITIAL_WALL_X = 6;
-            const int INITIAL_WALL_Y = 5;
             const string WALL_STRING = "W";
+            const string GOAL_STRING = "G";
+
+            const int GOAL_COUNT = 3;
+            const int BOX_COUNT = GOAL_COUNT;
+            const int WALL_COUNT = 3;
 
             // 플레이어 위치 좌표
             int playerX = INITIAL_PLAYER_X;
@@ -47,12 +47,16 @@ namespace Sokoban
             Direction playerDirection = Direction.Left;
 
             // 박스 좌표
-            int boxX = INITIAL_BOX_X;
-            int boxY = INITIAL_BOX_Y;
+            int[] boxPositionsX = new int[BOX_COUNT] { 1, 3, 5 };
+            int[] boxPositionsY = new int[BOX_COUNT] { 4, 2, 9 };
 
             // 벽 좌표
-            int wallX = INITIAL_WALL_X;
-            int wallY = INITIAL_WALL_Y;
+            int[] wallPositionsX = new int[WALL_COUNT] { 2, 7, 6 };
+            int[] wallPositionsY = new int[WALL_COUNT] { 4, 5, 3 };
+
+            // 골 좌표
+            int[] goalPositionsX = new int[GOAL_COUNT] { 3, 5, 8 };
+            int[] goalPositionsY = new int[GOAL_COUNT] { 3, 6, 3 };
 
             // 게임 루프
             while (true)
@@ -66,12 +70,25 @@ namespace Sokoban
                 Console.Write(PLAYER_STRING);
 
                 // 박스를 그려준다.
-                Console.SetCursorPosition(boxX, boxY);
-                Console.Write(BOX_STRING);
+                for (int i = 0; i < BOX_COUNT; ++i)
+                {
+                    Console.SetCursorPosition(boxPositionsX[i], boxPositionsY[i]);
+                    Console.Write(BOX_STRING);
+                }
 
                 // 벽을 그려준다.
-                Console.SetCursorPosition(wallX, wallY);
-                Console.Write(WALL_STRING);
+                for (int i = 0; i < WALL_COUNT; ++i)
+                {
+                    Console.SetCursorPosition(wallPositionsX[i], wallPositionsY[i]);
+                    Console.Write(WALL_STRING);
+                }
+
+                // 목표 지점을 그려준다.
+                for (int i = 0; i < GOAL_COUNT; ++i)
+                {
+                    Console.SetCursorPosition(goalPositionsX[i], goalPositionsY[i]);
+                    Console.Write(GOAL_STRING);
+                }
 
                 // ======================= ProcessInput =======================
                 ConsoleKeyInfo currentKeyInfo = Console.ReadKey();
@@ -107,8 +124,13 @@ namespace Sokoban
                 }
 
                 // 벽 충돌 처리
-                if (playerX == wallX && playerY == wallY)
+                for (int i = 0; i < WALL_COUNT; ++i)
                 {
+                    if (playerX != wallPositionsX[i] || playerY != wallPositionsY[i])
+                    {
+                        continue;
+                    }
+
                     switch (playerDirection)
                     {
                         case Direction.Left:
@@ -130,54 +152,169 @@ namespace Sokoban
                 }
 
                 // 박스 업데이트
-                if (playerX == boxX && playerY == boxY)
+                for (int i = 0; i < BOX_COUNT; ++i)
                 {
+                    int boxX = boxPositionsX[i];
+                    int boxY = boxPositionsY[i];
+
+                    if (playerX != boxX || playerY != boxY)
+                    {
+                        continue;
+                    }
+
                     switch (playerDirection)
                     {
-                        case Direction.Left: // Left
-                            if (boxX == CONSOLE_MIN_X || (boxX - 1 == wallX && boxY == wallY))
+                        case Direction.Left:
                             {
-                                playerX = boxX + 1;
-                            }
-                            else
-                            {
-                                boxX = boxX - 1;
+                                bool canMove = true;
+                                if (boxX == CONSOLE_MIN_X)
+                                {
+                                    canMove = false;
+                                }
+                                else
+                                {
+                                    for (int j = 0; j < WALL_COUNT; ++j)
+                                    {
+                                        if (boxX - 1 == wallPositionsX[j] && boxY == wallPositionsY[j])
+                                        {
+                                            canMove = false;
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (canMove)
+                                {
+                                    boxX = boxX - 1;
+                                }
+                                else
+                                {
+                                    playerX = boxX + 1;
+                                }
                             }
                             break;
-                        case Direction.Right: // Right
-                            if (boxX == CONSOLE_MAX_X || (boxX + 1 == wallX && boxY == wallY))
+                        case Direction.Right:
                             {
-                                playerX = boxX - 1;
+                                bool canMove = true;
+                                if (boxX == CONSOLE_MAX_X)
+                                {
+                                    canMove = false;
+                                }
+                                else
+                                {
+                                    for (int j = 0; j < WALL_COUNT; ++j)
+                                    {
+                                        if (boxX + 1 == wallPositionsX[j] && boxY == wallPositionsY[j])
+                                        {
+                                            canMove = false;
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (canMove)
+                                {
+                                    boxX = boxX + 1;
+                                }
+                                else
+                                {
+                                    playerX = boxX - 1;
+                                }
                             }
-                            else
+                            
+                            break;
+                        case Direction.Up:
                             {
-                                boxX = boxX + 1;
+                                bool canMove = true;
+                                if (boxY == CONSOLE_MIN_Y)
+                                {
+                                    canMove = false;
+                                }
+                                else
+                                {
+                                    for (int j = 0; j < WALL_COUNT; ++j)
+                                    {
+                                        if (boxX == wallPositionsX[j] && boxY - 1 == wallPositionsY[j])
+                                        {
+                                            canMove = false;
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (canMove)
+                                {
+                                    boxY = boxY - 1;
+                                }
+                                else
+                                {
+                                    playerY = boxY + 1;
+                                }
                             }
                             break;
-                        case Direction.Up: // Up
-                            if (boxY == CONSOLE_MIN_Y || (boxY - 1 == wallY && boxX == wallX))
+                        case Direction.Down:
                             {
-                                playerY = boxY + 1;
-                            }
-                            else
-                            {
-                                boxY = boxY - 1;
-                            }
-                            break;
-                        case Direction.Down: // Down
-                            if (boxY == CONSOLE_MAX_Y || (boxY + 1 == wallY && boxX == wallX))
-                            {
-                                playerY = boxY - 1;
-                            }
-                            else
-                            {
-                                boxY = boxY + 1;
+                                bool canMove = true;
+                                if (boxY == CONSOLE_MAX_Y)
+                                {
+                                    canMove = false;
+                                }
+                                else
+                                {
+                                    for (int j = 0; j < WALL_COUNT; ++j)
+                                    {
+                                        if (boxX == wallPositionsX[j] && boxY + 1 == wallPositionsY[j])
+                                        {
+                                            canMove = false;
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (canMove)
+                                {
+                                    boxY = boxY + 1;
+                                }
+                                else
+                                {
+                                    playerY = boxY - 1;
+                                }
                             }
                             break;
                         default:
                             Console.WriteLine($"[Error] 플레이어 방향 : {playerDirection}");
                             break;
                     }
+
+                    boxPositionsX[i] = boxX;
+                    boxPositionsY[i] = boxY;
+                }
+
+                // 목표 달성 확인
+                int count = 0;
+                for (int i = 0; i < GOAL_COUNT; ++i)
+                {
+                    for (int j = 0; j < BOX_COUNT; ++j)
+                    {
+                        if (goalPositionsX[i] == boxPositionsX[j] && goalPositionsY[i] == boxPositionsY[j])
+                        {
+                            ++count;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (count == GOAL_COUNT)
+                {
+                    Console.Clear();
+                    Console.WriteLine("축하합니다. 클리어 하셨습니다.");
+
+                    break;
                 }
             }
         }
