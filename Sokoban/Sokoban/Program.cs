@@ -37,6 +37,10 @@ namespace Sokoban
             const int INITIAL_BOX_Y = 5;
             const string BOX_STRING = "B";
 
+            const int INITIAL_WALL_X = 6;
+            const int INITIAL_WALL_Y = 5;
+            const string WALL_STRING = "W";
+
             // 플레이어 위치 좌표
             int playerX = INITIAL_PLAYER_X;
             int playerY = INITIAL_PLAYER_Y;
@@ -45,6 +49,10 @@ namespace Sokoban
             // 박스 좌표
             int boxX = INITIAL_BOX_X;
             int boxY = INITIAL_BOX_Y;
+
+            // 벽 좌표
+            int wallX = INITIAL_WALL_X;
+            int wallY = INITIAL_WALL_Y;
 
             // 게임 루프
             while (true)
@@ -60,6 +68,10 @@ namespace Sokoban
                 // 박스를 그려준다.
                 Console.SetCursorPosition(boxX, boxY);
                 Console.Write(BOX_STRING);
+
+                // 벽을 그려준다.
+                Console.SetCursorPosition(wallX, wallY);
+                Console.Write(WALL_STRING);
 
                 // ======================= ProcessInput =======================
                 ConsoleKeyInfo currentKeyInfo = Console.ReadKey();
@@ -94,15 +106,38 @@ namespace Sokoban
                     playerDirection = Direction.Right;
                 }
 
+                // 벽 충돌 처리
+                if (playerX == wallX && playerY == wallY)
+                {
+                    switch (playerDirection)
+                    {
+                        case Direction.Left:
+                            playerX = playerX + 1;
+                            break;
+                        case Direction.Right:
+                            playerX = playerX - 1;
+                            break;
+                        case Direction.Up:
+                            playerY = playerY + 1;
+                            break;
+                        case Direction.Down:
+                            playerY = playerY - 1;
+                            break;
+                        default:
+                            Console.WriteLine("오류 발생");
+                            break;
+                    }
+                }
+
                 // 박스 업데이트
                 if (playerX == boxX && playerY == boxY)
                 {
                     switch (playerDirection)
                     {
                         case Direction.Left: // Left
-                            if (boxX == CONSOLE_MIN_X)
+                            if (boxX == CONSOLE_MIN_X || (boxX - 1 == wallX && boxY == wallY))
                             {
-                                playerX = CONSOLE_MIN_X + 1;
+                                playerX = boxX + 1;
                             }
                             else
                             {
@@ -110,9 +145,9 @@ namespace Sokoban
                             }
                             break;
                         case Direction.Right: // Right
-                            if (boxX == CONSOLE_MAX_X)
+                            if (boxX == CONSOLE_MAX_X || (boxX + 1 == wallX && boxY == wallY))
                             {
-                                playerX = CONSOLE_MAX_X - 1;
+                                playerX = boxX - 1;
                             }
                             else
                             {
@@ -120,9 +155,9 @@ namespace Sokoban
                             }
                             break;
                         case Direction.Up: // Up
-                            if (boxY == CONSOLE_MIN_Y)
+                            if (boxY == CONSOLE_MIN_Y || (boxY - 1 == wallY && boxX == wallX))
                             {
-                                playerY = CONSOLE_MIN_Y + 1;
+                                playerY = boxY + 1;
                             }
                             else
                             {
@@ -130,9 +165,9 @@ namespace Sokoban
                             }
                             break;
                         case Direction.Down: // Down
-                            if (boxY == CONSOLE_MAX_Y)
+                            if (boxY == CONSOLE_MAX_Y || (boxY + 1 == wallY && boxX == wallX))
                             {
-                                playerY = CONSOLE_MAX_Y - 1;
+                                playerY = boxY - 1;
                             }
                             else
                             {
