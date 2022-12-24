@@ -4,6 +4,15 @@ namespace Sokoban
 {
     class Program
     {
+        // 방향을 위한 열거형 정의
+        enum Direction
+        {
+            Left,
+            Right,
+            Up,
+            Down
+        }
+
         static void Main()
         {
             // 초기 세팅
@@ -14,14 +23,28 @@ namespace Sokoban
             Console.ForegroundColor = ConsoleColor.Gray;        // 글꼴색을 설정한다.
             Console.Clear();                                    // 콘솔 창에 출력된 내용을 모두 지운다.
 
+            // 기호 상수 정의
+            const int CONSOLE_MIN_X = 0;
+            const int CONSOLE_MIN_Y = 0;
+            const int CONSOLE_MAX_X = 15;
+            const int CONSOLE_MAX_Y = 10;
+
+            const int INITIAL_PLAYER_X = 0;
+            const int INITIAL_PLAYER_Y = 0;
+            const string PLAYER_STRING = "P";
+
+            const int INITIAL_BOX_X = 5;
+            const int INITIAL_BOX_Y = 5;
+            const string BOX_STRING = "B";
+
             // 플레이어 위치 좌표
-            int playerX = 0;
-            int playerY = 0;
-            int playerDirection = 0; // 1 : Left / 2 : Right / 3 : Up / 4 : Down
+            int playerX = INITIAL_PLAYER_X;
+            int playerY = INITIAL_PLAYER_Y;
+            Direction playerDirection = Direction.Left;
 
             // 박스 좌표
-            int boxX = 5;
-            int boxY = 5;
+            int boxX = INITIAL_BOX_X;
+            int boxY = INITIAL_BOX_Y;
 
             // 게임 루프
             while (true)
@@ -32,11 +55,11 @@ namespace Sokoban
 
                 // 플레이어를 그려준다.
                 Console.SetCursorPosition(playerX, playerY);
-                Console.Write("P");
+                Console.Write(PLAYER_STRING);
 
                 // 박스를 그려준다.
                 Console.SetCursorPosition(boxX, boxY);
-                Console.Write("B");
+                Console.Write(BOX_STRING);
 
                 // ======================= ProcessInput =======================
                 ConsoleKeyInfo currentKeyInfo = Console.ReadKey();
@@ -46,29 +69,29 @@ namespace Sokoban
                 // 위로 이동
                 if (currentKeyInfo.Key == ConsoleKey.UpArrow)
                 {
-                    playerY = (int)Math.Max(0, playerY - 1);
-                    playerDirection = 3;
+                    playerY = (int)Math.Max(CONSOLE_MIN_Y, playerY - 1);
+                    playerDirection = Direction.Up;
                 }
 
                 // 아래로 이동
-                if (currentKeyInfo.Key == ConsoleKey.DownArrow)  
+                if (currentKeyInfo.Key == ConsoleKey.DownArrow)
                 {
-                    playerY = (int)Math.Min(playerY + 1, 10);
-                    playerDirection = 4;
+                    playerY = (int)Math.Min(playerY + 1, CONSOLE_MAX_Y);
+                    playerDirection = Direction.Down;
                 }
 
                 // 왼쪽으로 이동 
-                if (currentKeyInfo.Key == ConsoleKey.LeftArrow) 
+                if (currentKeyInfo.Key == ConsoleKey.LeftArrow)
                 {
-                    playerX = (int)Math.Max(0, playerX - 1);
-                    playerDirection = 1;
+                    playerX = (int)Math.Max(CONSOLE_MIN_X, playerX - 1);
+                    playerDirection = Direction.Left;
                 }
 
                 // 오른쪽으로 이동 
-                if (currentKeyInfo.Key == ConsoleKey.RightArrow) 
+                if (currentKeyInfo.Key == ConsoleKey.RightArrow)
                 {
-                    playerX = (int)Math.Min(playerX + 1, 15);
-                    playerDirection = 2;
+                    playerX = (int)Math.Min(playerX + 1, CONSOLE_MAX_X);
+                    playerDirection = Direction.Right;
                 }
 
                 // 박스 업데이트
@@ -76,40 +99,40 @@ namespace Sokoban
                 {
                     switch (playerDirection)
                     {
-                        case 1: // Left
-                            if (boxX == 0)
+                        case Direction.Left: // Left
+                            if (boxX == CONSOLE_MIN_X)
                             {
-                                playerX = 1;
+                                playerX = CONSOLE_MIN_X + 1;
                             }
                             else
                             {
                                 boxX = boxX - 1;
                             }
                             break;
-                        case 2: // Right
-                            if (boxX == 15)
+                        case Direction.Right: // Right
+                            if (boxX == CONSOLE_MAX_X)
                             {
-                                playerX = 14;
+                                playerX = CONSOLE_MAX_X - 1;
                             }
                             else
                             {
                                 boxX = boxX + 1;
                             }
                             break;
-                        case 3: // Up
-                            if (boxY == 0)
+                        case Direction.Up: // Up
+                            if (boxY == CONSOLE_MIN_Y)
                             {
-                                playerY = 1;
+                                playerY = CONSOLE_MIN_Y + 1;
                             }
                             else
                             {
                                 boxY = boxY - 1;
                             }
                             break;
-                        case 4: // Down
-                            if (boxY == 10)
+                        case Direction.Down: // Down
+                            if (boxY == CONSOLE_MAX_Y)
                             {
-                                playerY = 9;
+                                playerY = CONSOLE_MAX_Y - 1;
                             }
                             else
                             {
@@ -125,4 +148,3 @@ namespace Sokoban
         }
     }
 }
-
